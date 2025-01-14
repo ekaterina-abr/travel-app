@@ -1,11 +1,20 @@
 import { Box, IconButton, Text } from "@chakra-ui/react";
-import { Plus } from "@phosphor-icons/react";
+import { IconProps, Minus, Plus } from "@phosphor-icons/react";
 import { IDestination } from "../../types";
 
-export const DestinationCard = ({ title, description }: IDestination) => {
-  const onAddDestination = () => {
-    // TODO: add
-  };
+interface IDestinationCard extends IDestination {
+  onAdd: () => void;
+  onRemove: () => void;
+}
+
+export const DestinationCard = ({
+  title,
+  description,
+  isSelected = false,
+  onAdd,
+  onRemove,
+}: IDestinationCard) => {
+  const toggleIconStyles: IconProps = { color: "black" };
 
   return (
     <Box
@@ -18,13 +27,18 @@ export const DestinationCard = ({ title, description }: IDestination) => {
     >
       <Text fontSize="lg">{title}</Text>
       <Text>{description}</Text>
+
       <IconButton
-        onClick={onAddDestination}
+        onClick={isSelected ? onRemove : onAdd}
         rounded="full"
         variant="subtle"
         size="xs"
       >
-        <Plus color="black" />
+        {isSelected ? (
+          <Minus {...toggleIconStyles} />
+        ) : (
+          <Plus {...toggleIconStyles} />
+        )}
       </IconButton>
     </Box>
   );

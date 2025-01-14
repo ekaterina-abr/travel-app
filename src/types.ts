@@ -9,4 +9,5 @@ export interface IDestination {
   id: DestinationId;
   title: string;
   description?: string;
+  isSelected?: boolean;
 }
