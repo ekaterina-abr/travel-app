@@ -16,13 +16,17 @@ export const Header = observer(({ globalStore }: IHeader) => {
       borderBottom="1px solid black"
       padding={4}
     >
-      <Link as={RouterLink} href="/">
-        Главная
+      <Link asChild>
+        <RouterLink to="/">Главная</RouterLink>
       </Link>
-      <Flex alignItems="center" gap={1}>
-        <CalendarStar />
-        <Text>{globalStore.selectedDestinations.size}</Text>
-      </Flex>
+      <Link asChild>
+        <RouterLink to="/profile">
+          <Flex alignItems="center" gap={1}>
+            <CalendarStar />
+            <Text>{globalStore.selectedDestinations.size}</Text>
+          </Flex>
+        </RouterLink>
+      </Link>
     </Flex>
   );
 });

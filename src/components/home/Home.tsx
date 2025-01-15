@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { Flex, Text } from "@chakra-ui/react";
 import { destinations } from "../../config";
 import { Header } from "../header";
-import { DestinationCard } from "./DestinationCard";
+import { DestinationCard } from "../cards";
 import { GlobalStore } from "../../stores";
 import { DestinationId } from "../../types";
 
