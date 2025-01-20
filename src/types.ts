@@ -10,4 +10,5 @@ export interface IDestination {
   title: string;
   description?: string;
   isSelected?: boolean;
+  flag?: React.ReactNode;
 }

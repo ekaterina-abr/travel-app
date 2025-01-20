@@ -1,7 +1,7 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home, Profile } from "./components";
-import { theme } from "./config";
+import { theme } from "./theme";
 import { GlobalStore } from "./stores";
 
 const globalStore = new GlobalStore();
