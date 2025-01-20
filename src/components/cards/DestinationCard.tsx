@@ -1,8 +1,10 @@
-import { Flex, IconButton, Text } from "@chakra-ui/react";
+import { Flex, FlexProps, IconButton, Text } from "@chakra-ui/react";
 import { IconProps, Plus, Trash } from "@phosphor-icons/react";
 import { IDestination } from "../../types";
 
-interface IDestinationCard extends IDestination {
+interface IDestinationCard
+  extends IDestination,
+    Omit<FlexProps, "id" | "title"> {
   onAdd: () => void;
   onRemove: () => void;
   onRemoveCaption?: string;
@@ -16,6 +18,7 @@ export const DestinationCard = ({
   onAdd,
   onRemove,
   onRemoveCaption = "Добавлено",
+  ...other
 }: IDestinationCard) => {
   const toggleIconStyles: IconProps = { color: "black" };
 
@@ -27,9 +30,10 @@ export const DestinationCard = ({
       bg="blue.60"
       borderRadius="md"
       color="white"
-      w="200px"
+      minW="200px"
       minH="150px"
       p={4}
+      {...other}
     >
       <Flex flexDir="column" gap={3}>
         <Flex gap={3} alignItems="center">

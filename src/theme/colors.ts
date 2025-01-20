@@ -9,6 +9,7 @@ export const colors = {
   blue: {
     DEFAULT: { value: "rgba(17, 100, 180, 1)" },
     60: { value: "rgba(17, 100, 180, 0.6)" },
+    80: { value: "rgba(17, 100, 180, 0.8)" },
   },
   darkBlue: {
     DEFAULT: { value: "rgba(8, 35, 104, 1)" },

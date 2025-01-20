@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Link, Text } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Link, Text } from "@chakra-ui/react";
 import { GlobalStore } from "../../stores";
 import { DestinationCard } from "../cards";
 import { destinations } from "../../config";
@@ -27,7 +27,15 @@ export const SelectedDestinations = observer(
             </Link>
           </Text>
         ) : (
-          <Flex gap={4}>
+          <Grid
+            gap={4}
+            templateColumns={[
+              "repeat(1, 1fr)",
+              "repeat(2, 1fr)",
+              "repeat(3, 1fr)",
+              "repeat(4, 1fr)",
+            ]}
+          >
             {[...globalStore.selectedDestinations].map((destId) => {
               const destInfo = destinations.find(
                 (_dest) => _dest.id === destId
@@ -35,17 +43,20 @@ export const SelectedDestinations = observer(
 
               if (!destInfo) return null;
               return (
-                <DestinationCard
-                  {...destInfo}
-                  key={destId}
-                  isSelected
-                  onAdd={() => {}}
-                  onRemove={() => onRemoveDestination(destId)}
-                  onRemoveCaption=""
-                />
+                <GridItem h="100%">
+                  <DestinationCard
+                    {...destInfo}
+                    key={destId}
+                    isSelected
+                    onAdd={() => {}}
+                    onRemove={() => onRemoveDestination(destId)}
+                    onRemoveCaption=""
+                    h="100%"
+                  />
+                </GridItem>
               );
             })}
-          </Flex>
+          </Grid>
         )}
       </Flex>
     );

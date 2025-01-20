@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { Flex, Link, Text } from "@chakra-ui/react";
 import { CalendarStar } from "@phosphor-icons/react";
 import { GlobalStore } from "../../stores";
+import { routes } from "../../config";
 
 interface IHeader {
   globalStore: GlobalStore;
@@ -20,7 +21,7 @@ export const Header = observer(({ globalStore }: IHeader) => {
         <RouterLink to="/">Главная</RouterLink>
       </Link>
       <Link asChild color="darkBlue">
-        <RouterLink to="/profile">
+        <RouterLink to={routes.profile}>
           <Flex alignItems="center" gap={1}>
             <CalendarStar weight="fill" size={24} />
             <Text fontSize="lg">{globalStore.selectedDestinations.size}</Text>

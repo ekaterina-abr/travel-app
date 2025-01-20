@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Home, Profile } from "./components";
 import { theme } from "./theme";
 import { GlobalStore } from "./stores";
+import { routes } from "./config";
 
 const globalStore = new GlobalStore();
 
@@ -13,7 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home globalStore={globalStore} />} />
           <Route
-            path="/profile"
+            path={routes.profile}
             element={<Profile globalStore={globalStore} />}
           />
         </Routes>
