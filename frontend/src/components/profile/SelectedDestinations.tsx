@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Grid, GridItem, Link, Text } from "@chakra-ui/react";
+import { Flex, Grid, GridItem, Link, Spinner, Text } from "@chakra-ui/react";
 import { GlobalStore } from "../../stores";
 import { DestinationCard } from "../cards";
-import { destinations } from "../../config";
+import { useGetDestinations } from "../../hooks";
 
 interface ISelectedDestinations {
   globalStore: GlobalStore;
@@ -11,6 +11,9 @@ interface ISelectedDestinations {
 
 export const SelectedDestinations = observer(
   ({ globalStore }: ISelectedDestinations) => {
+    const { data: destinationsData, isLoading: destinationsIsLoading } =
+      useGetDestinations();
+
     const onRemoveDestination = (dest: string) => {
       globalStore.removeDestination(dest);
     };
@@ -18,7 +21,9 @@ export const SelectedDestinations = observer(
     return (
       <Flex flexDir="column" gap={4}>
         <Text>Добавленные направления</Text>
-        {globalStore.selectedDestinations.size === 0 ? (
+        {destinationsIsLoading ? (
+          <Spinner />
+        ) : globalStore.selectedDestinations.size === 0 ? (
           <Text>
             Пока ничего не добавлено.{" "}
             <Link asChild variant="text">
@@ -36,18 +41,16 @@ export const SelectedDestinations = observer(
             ]}
           >
             {[...globalStore.selectedDestinations].map((destId) => {
-              const destInfo = destinations.find(
+              const destInfo = destinationsData?.destinations?.find(
                 (_dest) => _dest.id === destId
               );
 
               if (!destInfo) return null;
               return (
-                <GridItem h="100%">
+                <GridItem h="100%" key={destId}>
                   <DestinationCard
                     {...destInfo}
-                    key={destId}
                     isSelected
-                    onAdd={() => {}}
                     onRemove={() => onRemoveDestination(destId)}
                     onRemoveCaption=""
                     h="100%"

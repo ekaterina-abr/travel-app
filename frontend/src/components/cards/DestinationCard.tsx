@@ -1,27 +1,31 @@
 import { Flex, FlexProps, IconButton, Text } from "@chakra-ui/react";
 import { IconProps, Plus, Trash } from "@phosphor-icons/react";
-import { IDestination } from "../../types";
+import * as flags from "country-flag-icons/react/3x2";
+import { IDestinationResponse } from "../../types";
 
 interface IDestinationCard
-  extends IDestination,
-    Omit<FlexProps, "id" | "title"> {
-  onAdd: () => void;
-  onRemove: () => void;
+  extends IDestinationResponse,
+    Omit<FlexProps, "title"> {
+  onAdd?: () => void;
+  onRemove?: () => void;
   onRemoveCaption?: string;
 }
+
+const flagStyle: React.SVGAttributes<SVGElement> = { width: 16 };
 
 export const DestinationCard = ({
   title,
   description,
   isSelected = false,
-  flag,
-  onAdd,
-  onRemove,
+  isoCode,
+  onAdd = () => {},
+  onRemove = () => {},
   onRemoveCaption = "Добавлено",
   id,
   ...other
 }: IDestinationCard) => {
   const toggleIconStyles: IconProps = { color: "black" };
+  const Flag = isoCode ? flags[isoCode as keyof typeof flags] : undefined;
 
   return (
     <Flex
@@ -40,7 +44,7 @@ export const DestinationCard = ({
       <Flex flexDir="column" gap={3}>
         <Flex gap={3} alignItems="center">
           <Text fontSize="lg">{title}</Text>
-          {flag}
+          {Flag && <Flag {...flagStyle} />}
         </Flex>
         <Text fontSize="sm">{description}</Text>
       </Flex>

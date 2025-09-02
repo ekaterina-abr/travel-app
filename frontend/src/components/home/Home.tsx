@@ -1,21 +1,24 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Grid, GridItem, Link, Text } from "@chakra-ui/react";
-import { destinations, routes } from "../../config";
+import { Flex, Grid, GridItem, Link, Spinner, Text } from "@chakra-ui/react";
+import { routes } from "../../config";
 import { Header } from "../header";
 import { DestinationCard } from "../cards";
 import { GlobalStore } from "../../stores";
-import { DestinationId } from "../../types";
+import { useGetDestinations } from "../../hooks";
 
 interface IHome {
   globalStore: GlobalStore;
 }
 
 export const Home = observer(({ globalStore }: IHome) => {
-  const onAddDestination = (dest: DestinationId) => {
+  const { data: destinationsData, isLoading: destinationsIsLoading } =
+    useGetDestinations();
+
+  const onAddDestination = (dest: string) => {
     globalStore.addDestination(dest);
   };
-  const onRemoveDestination = (dest: DestinationId) => {
+  const onRemoveDestination = (dest: string) => {
     globalStore.removeDestination(dest);
   };
 
@@ -27,28 +30,31 @@ export const Home = observer(({ globalStore }: IHome) => {
         <Link asChild variant="text">
           <RouterLink to={routes.profile}>Посмотреть добавленные</RouterLink>
         </Link>
-        <Grid
-          gap={4}
-          templateColumns={[
-            "repeat(1, 1fr)",
-            "repeat(2, 1fr)",
-            "repeat(3, 1fr)",
-            "repeat(4, 1fr)",
-          ]}
-        >
-          {destinations.map((dest) => (
-            <GridItem h="100%">
-              <DestinationCard
-                {...dest}
-                key={dest.id}
-                isSelected={globalStore.selectedDestinations.has(dest.id)}
-                onAdd={() => onAddDestination(dest.id)}
-                onRemove={() => onRemoveDestination(dest.id)}
-                h="100%"
-              />
-            </GridItem>
-          ))}
-        </Grid>
+        {destinationsIsLoading ? (
+          <Spinner />
+        ) : (
+          <Grid
+            gap={4}
+            templateColumns={[
+              "repeat(1, 1fr)",
+              "repeat(2, 1fr)",
+              "repeat(3, 1fr)",
+              "repeat(4, 1fr)",
+            ]}
+          >
+            {destinationsData?.destinations?.map((dest) => (
+              <GridItem h="100%" key={dest.id}>
+                <DestinationCard
+                  {...dest}
+                  isSelected={globalStore.selectedDestinations.has(dest.id)}
+                  onAdd={() => onAddDestination(dest.id)}
+                  onRemove={() => onRemoveDestination(dest.id)}
+                  h="100%"
+                />
+              </GridItem>
+            ))}
+          </Grid>
+        )}
       </Flex>
     </>
   );
