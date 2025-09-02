@@ -1,0 +1,27 @@
+{
+  "name": "travel-app-backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.0",
+    "eslint": "^9.34.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

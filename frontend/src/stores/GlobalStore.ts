@@ -1,18 +1,17 @@
 import { makeAutoObservable } from "mobx";
-import { DestinationId } from "../types";
 
 export class GlobalStore {
-  selectedDestinations: Set<DestinationId> = new Set();
+  selectedDestinations: Set<string> = new Set();
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  addDestination(dest: DestinationId) {
+  addDestination(dest: string) {
     this.selectedDestinations.add(dest);
   }
 
-  removeDestination(dest: DestinationId) {
+  removeDestination(dest: string) {
     this.selectedDestinations.delete(dest);
   }
 }
