@@ -18,6 +18,7 @@ export const DestinationCard = ({
   onAdd,
   onRemove,
   onRemoveCaption = "Добавлено",
+  id,
   ...other
 }: IDestinationCard) => {
   const toggleIconStyles: IconProps = { color: "black" };
@@ -33,6 +34,7 @@ export const DestinationCard = ({
       minW="200px"
       minH="150px"
       p={4}
+      id={`destination-card-${id}`}
       {...other}
     >
       <Flex flexDir="column" gap={3}>

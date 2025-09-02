@@ -4,7 +4,6 @@ import { Flex, Grid, GridItem, Link, Text } from "@chakra-ui/react";
 import { GlobalStore } from "../../stores";
 import { DestinationCard } from "../cards";
 import { destinations } from "../../config";
-import { DestinationId } from "../../types";
 
 interface ISelectedDestinations {
   globalStore: GlobalStore;
@@ -12,7 +11,7 @@ interface ISelectedDestinations {
 
 export const SelectedDestinations = observer(
   ({ globalStore }: ISelectedDestinations) => {
-    const onRemoveDestination = (dest: DestinationId) => {
+    const onRemoveDestination = (dest: string) => {
       globalStore.removeDestination(dest);
     };
 

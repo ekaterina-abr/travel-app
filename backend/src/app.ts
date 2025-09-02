@@ -5,7 +5,7 @@ const PORT = 3001;
 const app = express();
 
 app.get("/api/destinations", (request, response) => {
-  response.json(destinations);
+  response.json({ destinations });
 });
 
 app.listen(PORT, () => {

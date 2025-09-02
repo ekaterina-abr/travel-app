@@ -5,8 +5,16 @@ export enum DestinationId {
   UAE = "UAE",
 }
 
+export interface IDestinationResponse {
+  id: string;
+  title: string;
+  description?: string;
+  isSelected?: boolean;
+  isoCode?: string;
+}
+
 export interface IDestination {
-  id: DestinationId;
+  id: string;
   title: string;
   description?: string;
   isSelected?: boolean;
