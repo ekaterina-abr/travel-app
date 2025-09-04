@@ -6,6 +6,9 @@ const apiClient = axios.create();
 apiClient.defaults.baseURL = baseUrl;
 apiClient.interceptors.response.use((response) => response.data);
 
-const apiUrls: Record<string, string> = { destinations: "/destinations" };
+const apiUrls: Record<string, string> = {
+  destinations: "/destinations",
+  notifications: "/notifications",
+};
 
 export { apiClient, apiUrls };

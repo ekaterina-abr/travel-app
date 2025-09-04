@@ -5,3 +5,10 @@ export interface IDestinationResponse {
   isSelected?: boolean;
   isoCode?: string;
 }
+
+export interface INotification {
+  id: number;
+  text: string;
+  date: Date;
+  isRead: boolean;
+}
