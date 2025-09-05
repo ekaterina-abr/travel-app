@@ -12,7 +12,6 @@ export const Notifications = ({
   onMarkRead,
 }: INotifications) => {
   const onSelect = (details: SelectionDetails) => {
-    console.log("details", details);
     const notificationId = Number(details.value.split("-")[1]);
     if (
       notificationId &&

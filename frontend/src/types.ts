@@ -12,3 +12,13 @@ export interface INotification {
   date: Date;
   isRead: boolean;
 }
+
+export interface INotificationWSReceivedMsg {
+  type: "new-notification";
+  msg: INotification;
+}
+
+export interface INotificationWSSentMsg {
+  type: "mark-read";
+  id: number;
+}

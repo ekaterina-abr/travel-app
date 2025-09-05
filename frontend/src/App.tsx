@@ -1,7 +1,7 @@
 import { QueryProvider } from "./api";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Home, Profile } from "./components";
+import { Header, Home, Profile } from "./components";
 import { theme } from "./theme";
 import { GlobalStore } from "./stores";
 import { routes } from "./config";
@@ -13,6 +13,7 @@ function App() {
     <QueryProvider>
       <BrowserRouter>
         <ChakraProvider value={theme}>
+          <Header globalStore={globalStore} />
           <Routes>
             <Route path="/" element={<Home globalStore={globalStore} />} />
             <Route
