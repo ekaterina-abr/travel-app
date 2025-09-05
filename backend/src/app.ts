@@ -3,7 +3,7 @@ import cors from "cors";
 import { WebSocketServer } from "ws";
 import { destinations, notifications } from "./config/index.js";
 import type { INotificationWSReceivedMsg } from "./types.js";
-import { sendWSNotification } from "./utils/sendWSNotification.js";
+import { sendWSNotification } from "./utils/index.js";
 
 const PORT = 3001;
 const baseRoutePath = "/api";
