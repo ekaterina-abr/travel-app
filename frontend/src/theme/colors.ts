@@ -14,4 +14,7 @@ export const colors = {
   darkBlue: {
     DEFAULT: { value: "rgba(8, 35, 104, 1)" },
   },
+  grey: {
+    DEFAULT: { value: "rgba(226, 232, 240, 1)" },
+  },
 };
