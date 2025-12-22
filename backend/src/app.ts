@@ -4,6 +4,9 @@ import { WebSocketServer } from "ws";
 import { destinations, notifications } from "./config/index.js";
 import type { INotificationWSReceivedMsg } from "./types.js";
 import { sendWSNotification } from "./utils/index.js";
+import authRouter from "./routes/auth.js";
+import auth from "./middleware/auth.js";
+import { sequelize } from "./models/index.js";
 
 const PORT = 3001;
 const baseRoutePath = "/api";
@@ -11,16 +14,28 @@ const app = express();
 
 app.use(cors());
 
-app.get(`${baseRoutePath}/destinations`, (request, response) => {
-  response.json({ destinations });
+app.get(`${baseRoutePath}/destinations`, (req, res) => {
+  res.json({ destinations });
 });
 
-app.get(`${baseRoutePath}/notifications`, (request, response) => {
-  response.json({ notifications });
+app.get(`${baseRoutePath}/notifications`, (req, res) => {
+  res.json({ notifications });
 });
 
-const server = app.listen(PORT, () => {
+app.use(`${baseRoutePath}/auth`, authRouter);
+
+app.get("/profile", auth, (req, res) => {
+  res.send("This is a protected route");
+});
+
+const server = app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  try {
+    await sequelize.authenticate();
+    console.log("Соединение с БД было успешно установлено");
+  } catch (e) {
+    console.log("Невозможно выполнить подключение к БД: ", JSON.stringify(e));
+  }
 });
 
 const wsServer = new WebSocketServer({
