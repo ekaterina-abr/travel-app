@@ -1,9 +1,11 @@
-export enum DestinationId {
-  Egypt = "Egypt",
-  Thailand = "Thailand",
-  Turkey = "Turkey",
-  UAE = "UAE",
-}
+export const DestinationId = {
+  Egypt: "Egypt",
+  Thailand: "Thailand",
+  Turkey: "Turkey",
+  UAE: "UAE",
+} as const;
+
+export type DestinationId = (typeof DestinationId)[keyof typeof DestinationId];
 
 export interface IDestination {
   id: DestinationId;

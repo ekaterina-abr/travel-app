@@ -1,4 +1,4 @@
-import { DestinationId, type IDestination } from "../types.js";
+import { DestinationId, type IDestination } from "../../types.ts";
 
 export const destinations: IDestination[] = [
   {

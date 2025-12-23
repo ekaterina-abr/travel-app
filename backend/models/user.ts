@@ -4,7 +4,7 @@ import {
   type ModelAttributes,
   type Optional,
 } from "sequelize";
-import { DestinationId } from "../types.js";
+import { DestinationId } from "../types.ts";
 
 export interface IUserSchemeAttributes {
   id: number;

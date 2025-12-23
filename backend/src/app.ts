@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { WebSocketServer } from "ws";
-import { destinations, notifications } from "./config/index.js";
-import type { INotificationWSReceivedMsg } from "./types.js";
-import { sendWSNotification } from "./utils/index.js";
-import authRouter from "./routes/auth.js";
-import auth from "./middleware/auth.js";
-import { sequelize } from "./models/index.js";
+import type { Sequelize } from "sequelize";
+import { destinations, notifications } from "./config/index.ts";
+import type { INotificationWSReceivedMsg } from "../types.ts";
+import { sendWSNotification } from "./utils/index.ts";
+import authRouter from "./routes/auth.ts";
+import auth from "./middleware/auth.ts";
+import { db } from "../models/index.ts";
 
 const PORT = 3001;
 const baseRoutePath = "/api";
@@ -31,10 +32,10 @@ app.get("/profile", auth, (req, res) => {
 const server = app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   try {
-    await sequelize.authenticate();
-    console.log("Соединение с БД было успешно установлено");
+    await (db?.sequelize as Sequelize | undefined)?.authenticate();
+    console.log("Connection to db established");
   } catch (e) {
-    console.log("Невозможно выполнить подключение к БД: ", JSON.stringify(e));
+    console.log("Unable to connect to db: ", JSON.stringify(e));
   }
 });
 

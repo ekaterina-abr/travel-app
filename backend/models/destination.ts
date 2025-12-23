@@ -1,11 +1,12 @@
 import { DataTypes, type Model, type ModelAttributes } from "sequelize";
-import { DestinationId } from "../types.js";
+import { DestinationId } from "../types.ts";
 
 export interface IDestinationSchemeAttributes {
   id: DestinationId;
   title: string;
   description: string;
   isoCode: string;
+  savedTimes: number;
 }
 
 export interface IDestinationSchemeInput extends IDestinationSchemeAttributes {}
@@ -33,5 +34,9 @@ export const destinationScheme: ModelAttributes<
   isoCode: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  savedTimes: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
 };

@@ -1,5 +1,5 @@
 import type { WebSocket } from "ws";
-import type { INotification, INotificationWSSentMsg } from "../types.js";
+import type { INotification, INotificationWSSentMsg } from "../../types.ts";
 
 interface ISendWSNotificationArgs {
   text: string;

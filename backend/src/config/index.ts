@@ -1,2 +1,2 @@
-export * from "./destinations.js";
-export * from "./notifications.js";
+export * from "./destinations.ts";
+export * from "./notifications.ts";
