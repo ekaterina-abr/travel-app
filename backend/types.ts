@@ -31,3 +31,8 @@ export interface INotificationWSReceivedMsg {
   type: "mark-read";
   id: number;
 }
+
+export interface IApolloContext {
+  session: string;
+  setSession: (session: string, expiresAt: Date) => void;
+}
