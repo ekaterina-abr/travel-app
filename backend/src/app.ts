@@ -1,5 +1,9 @@
 import express from "express";
-import cors from "cors";
+import cors, {
+  type CorsOptions,
+  type CorsOptionsDelegate,
+  type CorsRequest,
+} from "cors";
 import { WebSocketServer } from "ws";
 import type { Sequelize } from "sequelize";
 import cookieParser from "cookie-parser";
@@ -18,10 +22,27 @@ import { sessionCookieName, sessionCookieOptions } from "../session/index.ts";
 const PORT = 3001;
 const baseRoutePath = "/api";
 const graphqlRoutePath = `${baseRoutePath}/gql`;
+const frontendOrigin = "http://localhost:5173";
+
+const corsOptions: CorsOptions = {
+  origin: frontendOrigin,
+  credentials: true,
+};
+
+const dynamicCorsOptions: CorsOptionsDelegate<CorsRequest & { path: string }> =
+  function (req, callback) {
+    let _corsOptions;
+    if (req.path.startsWith(graphqlRoutePath)) {
+      _corsOptions = corsOptions;
+    } else {
+      _corsOptions = { origin: "*" };
+    }
+    callback(null, _corsOptions);
+  };
 
 const init = async () => {
   const app = express();
-  app.use(cors(), express.json(), cookieParser());
+  app.use(cors(dynamicCorsOptions), express.json(), cookieParser());
 
   const apolloServer = new ApolloServer<IApolloContext>({
     typeDefs,
@@ -29,6 +50,8 @@ const init = async () => {
   });
 
   await apolloServer.start();
+
+  app.options(graphqlRoutePath, cors(corsOptions));
 
   app.use(
     graphqlRoutePath,

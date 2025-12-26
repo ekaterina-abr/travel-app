@@ -22,3 +22,8 @@ export interface INotificationWSSentMsg {
   type: "mark-read";
   id: number;
 }
+
+export interface IVerifySessionResponse {
+  isAuth: boolean;
+  userId?: number;
+}

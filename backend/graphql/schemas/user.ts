@@ -1,12 +1,7 @@
 export const userSchema = `#graphql
 scalar Date
-
-enum DestinationId {
-  Egypt = "Egypt",
-  Thailand = "Thailand",
-  Turkey = "Turkey",
-  UAE = "UAE"
-}
+scalar DestinationId
+scalar Null
 
 type User {
   id: Int!
@@ -51,10 +46,10 @@ type Session {
 type Mutation {
   register(input: RegisterInput!): RegisterResponse
   login(input: LoginInput!): LoginResponse
-  logout(): null
+  logout: Null
 }
 
 type Query {
-  verifySession(): Session!
+  verifySession: Session!
 }
 `;
