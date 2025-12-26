@@ -1,7 +1,7 @@
 import { QueryProvider } from "./api";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Header, Home, Profile } from "./components";
+import { Header, Home, Login, Profile, Signup } from "./components";
 import { theme } from "./theme";
 import { GlobalStore } from "./stores";
 import { routes } from "./config";
@@ -20,6 +20,8 @@ function App() {
               path={routes.profile}
               element={<Profile globalStore={globalStore} />}
             />
+            <Route path={routes.signup} element={<Signup />} />
+            <Route path={routes.login} element={<Login />} />
           </Routes>
         </ChakraProvider>
       </BrowserRouter>

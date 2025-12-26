@@ -1,4 +1,4 @@
-import { Button, Menu, Portal, SelectionDetails } from "@chakra-ui/react";
+import { Button, Menu, Portal, MenuSelectionDetails } from "@chakra-ui/react";
 import { BellSimple } from "@phosphor-icons/react";
 import { INotification } from "../../types";
 
@@ -11,7 +11,7 @@ export const Notifications = ({
   notifications,
   onMarkRead,
 }: INotifications) => {
-  const onSelect = (details: SelectionDetails) => {
+  const onSelect = (details: MenuSelectionDetails) => {
     const notificationId = Number(details.value.split("-")[1]);
     if (
       notificationId &&
@@ -39,7 +39,7 @@ export const Notifications = ({
                 bg={notification.isRead ? "white" : "grey"}
                 _hover={{
                   bg: notification.isRead ? "white" : "beige.50",
-                  cursor: !notification.isRead && "pointer",
+                  cursor: !notification.isRead ? "pointer" : "default",
                 }}
               >
                 {notification.text}
