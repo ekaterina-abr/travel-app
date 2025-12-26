@@ -1,23 +1,39 @@
-import { Link as RouterLink } from "react-router-dom";
+import { useEffect } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
+  Center,
   Field,
   Flex,
   Heading,
   Input,
   InputProps,
   Link,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import { SignupFormSchema, SignupFormSchemaType } from "../../zod-schemes";
 import { routes } from "../../config";
+import { useGetVerifySession } from "../../hooks";
+import { apiUrls } from "../../api";
 
 const inputStyles: InputProps = { size: "lg" };
 
-// TODO: check is user already logged in, then redirect to profile
 export const Signup = () => {
+  const navigate = useNavigate();
+  const {
+    loading: verifySessionLoading,
+    data: verifySessionData,
+    // error: verifySessionError,
+  } = useGetVerifySession();
+
+  useEffect(() => {
+    if (verifySessionData?.isAuth) {
+      navigate(apiUrls.profile);
+    }
+  }, [navigate, verifySessionData]);
   const { register, handleSubmit, formState } = useForm<SignupFormSchemaType>({
     resolver: zodResolver(SignupFormSchema),
     mode: "onTouched",
@@ -27,6 +43,14 @@ export const Signup = () => {
     console.log("submit data", JSON.stringify(data));
     // TODO: add request to backend
   };
+
+  if (verifySessionLoading) {
+    return (
+      <Center h="80vh">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
 
   return (
     <Flex py={5} px={4} justifyContent="center">
