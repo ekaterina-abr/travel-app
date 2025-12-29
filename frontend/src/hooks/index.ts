@@ -1,4 +1,6 @@
 export * from "./useGetDestinations";
 export * from "./useGetNotifications";
 export * from "./useGetVerifySession";
+export * from "./useMutateLogin";
+export * from "./useMutateRegister";
 export * from "./useWebSocketClient";

@@ -39,7 +39,9 @@ export const authResolver = {
           "Пользователь с данным email уже зарегистрирован"
         );
       }
-      const user = await User.create({ name, email, password });
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({ name, email, password: hashedPassword });
 
       if (!user) {
         throw new GraphQLError("Ошибка создания аккаунта");

@@ -27,3 +27,16 @@ export interface IVerifySessionResponse {
   isAuth: boolean;
   userId?: number;
 }
+
+export interface IMutateRegisterResponse {
+  id: number;
+  name: string;
+  email: string;
+  token: string;
+}
+export interface IMutateLoginResponse {
+  id: number;
+  name: string;
+  email: string;
+  token: string;
+}

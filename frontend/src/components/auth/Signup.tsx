@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { SignupFormSchema, SignupFormSchemaType } from "../../zod-schemes";
 import { routes } from "../../config";
-import { useGetVerifySession } from "../../hooks";
+import { useGetVerifySession, useMutateRegister } from "../../hooks";
 import { apiUrls } from "../../api";
 
 const inputStyles: InputProps = { size: "lg" };
@@ -29,19 +29,34 @@ export const Signup = () => {
     // error: verifySessionError,
   } = useGetVerifySession();
 
+  const [
+    mutateRegister,
+    {
+      data: registerResultData,
+      loading: registerLoading,
+      // error: registerError,
+    },
+  ] = useMutateRegister();
+
   useEffect(() => {
     if (verifySessionData?.isAuth) {
       navigate(apiUrls.profile);
     }
   }, [navigate, verifySessionData]);
+
+  useEffect(() => {
+    if (registerResultData && registerResultData?.token) {
+      navigate(apiUrls.profile);
+    }
+  }, [navigate, registerResultData]);
+
   const { register, handleSubmit, formState } = useForm<SignupFormSchemaType>({
     resolver: zodResolver(SignupFormSchema),
     mode: "onTouched",
   });
 
   const onSubmit = (data: SignupFormSchemaType) => {
-    console.log("submit data", JSON.stringify(data));
-    // TODO: add request to backend
+    mutateRegister({ variables: { input: data } });
   };
 
   if (verifySessionLoading) {
@@ -101,8 +116,11 @@ export const Signup = () => {
               {formState.errors?.password?.message}
             </Field.ErrorText>
           </Field.Root>
-          {/* TODO: add {isPending ||} to disabled prop */}
-          <Button type="submit" size="lg" disabled={!formState.isValid}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={registerLoading || !formState.isValid}
+          >
             Зарегистрироваться
           </Button>
           <Flex justifyContent="center">
