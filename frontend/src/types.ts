@@ -28,19 +28,32 @@ export interface INotificationWSSentMsg {
 }
 
 export interface IVerifySessionResponse {
-  isAuth: boolean;
-  userId?: number;
+  verifySession: {
+    isAuth: boolean;
+    userId?: number;
+  };
 }
 
 export interface IMutateRegisterResponse {
-  id: number;
-  name: string;
-  email: string;
-  token: string;
+  register: {
+    id: number;
+    name: string;
+    email: string;
+    token: string;
+  };
 }
 export interface IMutateLoginResponse {
-  id: number;
-  name: string;
-  email: string;
-  token: string;
+  login: {
+    id: number;
+    name: string;
+    email: string;
+    token: string;
+  };
+}
+
+export interface IMutateLogoutResponse {
+  logout: {
+    isAuth: boolean;
+    userId?: number;
+  };
 }

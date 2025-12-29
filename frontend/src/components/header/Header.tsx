@@ -4,74 +4,20 @@ import { Flex, Link, Spinner, Text } from "@chakra-ui/react";
 import { CalendarStar } from "@phosphor-icons/react";
 import { GlobalStore } from "../../stores";
 import { routes } from "../../config";
-import { Notifications } from "./Notifications";
-import { useGetNotifications, useWebSocketClient } from "../../hooks";
-import { apiUrls } from "../../api";
-import { useEffect, useMemo, useState } from "react";
-import {
-  INotification,
-  INotificationWSReceivedMsg,
-  INotificationWSSentMsg,
-} from "../../types";
+import { useGetVerifySession } from "../../hooks";
+import { NotificationsBlock } from "./NotificationsBlock";
+import { Logout } from "./Logout";
 
 interface IHeader {
   globalStore: GlobalStore;
 }
 
 export const Header = observer(({ globalStore }: IHeader) => {
-  const [notifications, setNotifications] = useState<INotification[]>([]);
-  const { data: notificationsData, isLoading: notificationsIsLoading } =
-    useGetNotifications();
-
-  const shouldConnectWSNotifications = useMemo(
-    () => !!notificationsData,
-    [notificationsData]
-  );
-
   const {
-    sendJsonMessage: sendJsonMessageNotifications,
-    lastJsonMessage: lastJsonMessageNotifications,
-  } = useWebSocketClient<INotificationWSReceivedMsg>({
-    url: apiUrls.updateNotifications,
-    shouldConnect: shouldConnectWSNotifications,
-  });
-
-  useEffect(() => {
-    if (
-      notificationsData?.notifications &&
-      notificationsData.notifications.length > 0
-    ) {
-      setNotifications(notificationsData.notifications);
-    }
-  }, [notificationsData]);
-
-  useEffect(() => {
-    if (
-      lastJsonMessageNotifications &&
-      lastJsonMessageNotifications.type === "new-notification" &&
-      lastJsonMessageNotifications.msg
-    ) {
-      setNotifications((prevValue) => [
-        lastJsonMessageNotifications.msg,
-        ...prevValue,
-      ]);
-    }
-  }, [lastJsonMessageNotifications]);
-
-  const onMarkNotificationRead = (notificationId: number) => {
-    sendJsonMessageNotifications<INotificationWSSentMsg>({
-      type: "mark-read",
-      id: notificationId,
-    });
-    const notificationIndex = notifications.findIndex(
-      (item) => item.id === notificationId
-    );
-    if (notificationIndex !== -1) {
-      const _notifications = [...notifications];
-      _notifications[notificationIndex].isRead = true;
-      setNotifications(_notifications);
-    }
-  };
+    loading: verifySessionLoading,
+    data: verifySessionData,
+    // error: verifySessionError,
+  } = useGetVerifySession();
 
   return (
     <Flex
@@ -83,14 +29,15 @@ export const Header = observer(({ globalStore }: IHeader) => {
       <Link asChild color="darkBlue">
         <RouterLink to="/">Главная</RouterLink>
       </Link>
-      <Flex alignItems="center" gap={4}>
-        {notificationsIsLoading ? (
+      <Flex alignItems="center" gap={2}>
+        {verifySessionLoading ? (
           <Spinner />
+        ) : verifySessionData?.verifySession?.isAuth ? (
+          <NotificationsBlock />
         ) : (
-          <Notifications
-            notifications={notifications}
-            onMarkRead={onMarkNotificationRead}
-          />
+          <Link asChild color="darkBlue">
+            <RouterLink to={routes.login}>Войти</RouterLink>
+          </Link>
         )}
         <Link asChild color="darkBlue">
           <RouterLink to={routes.profile}>
@@ -100,6 +47,7 @@ export const Header = observer(({ globalStore }: IHeader) => {
             </Flex>
           </RouterLink>
         </Link>
+        {verifySessionData?.verifySession?.isAuth && <Logout />}
       </Flex>
     </Flex>
   );

@@ -42,3 +42,12 @@ export const DESTINATIONS_SCHEME = gql`
     }
   }
 `;
+
+export const LOGOUT_SCHEME = gql`
+  mutation logout {
+    logout {
+      isAuth
+      userId
+    }
+  }
+`;

@@ -24,7 +24,7 @@ export const Notifications = ({
   return (
     <Menu.Root onSelect={onSelect}>
       <Menu.Trigger asChild>
-        <Button variant="outline" size="md">
+        <Button variant="ghost" size="md" px={2}>
           <BellSimple weight="fill" />
         </Button>
       </Menu.Trigger>

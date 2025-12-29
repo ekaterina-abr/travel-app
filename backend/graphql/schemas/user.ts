@@ -1,7 +1,6 @@
 export const userSchema = `#graphql
 scalar Date
 scalar DestinationId
-scalar Null
 
 type User {
   id: Int!
@@ -46,7 +45,7 @@ type Session {
 type Mutation {
   register(input: RegisterInput!): RegisterResponse
   login(input: LoginInput!): LoginResponse
-  logout: Null
+  logout: Session!
 }
 
 type Query {

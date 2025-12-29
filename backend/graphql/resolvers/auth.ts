@@ -69,6 +69,7 @@ export const authResolver = {
     },
     async logout(parent: any, args: null, context: IApolloContext) {
       deleteSession(context.setSession);
+      return { isAuth: false, userId: null };
     },
   },
 };

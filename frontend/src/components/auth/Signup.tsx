@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Navigate, Link as RouterLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -17,12 +17,11 @@ import {
 import { SignupFormSchema, SignupFormSchemaType } from "../../zod-schemes";
 import { routes } from "../../config";
 import { useGetVerifySession, useMutateRegister } from "../../hooks";
-import { apiUrls } from "../../api";
+import { graphqlClient } from "../../api";
 
 const inputStyles: InputProps = { size: "lg" };
 
 export const Signup = () => {
-  const navigate = useNavigate();
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
@@ -39,16 +38,10 @@ export const Signup = () => {
   ] = useMutateRegister();
 
   useEffect(() => {
-    if (verifySessionData?.isAuth) {
-      navigate(apiUrls.profile);
+    if (registerResultData && registerResultData?.register?.token) {
+      graphqlClient.resetStore();
     }
-  }, [navigate, verifySessionData]);
-
-  useEffect(() => {
-    if (registerResultData && registerResultData?.token) {
-      navigate(apiUrls.profile);
-    }
-  }, [navigate, registerResultData]);
+  }, [registerResultData]);
 
   const { register, handleSubmit, formState } = useForm<SignupFormSchemaType>({
     resolver: zodResolver(SignupFormSchema),
@@ -65,6 +58,10 @@ export const Signup = () => {
         <Spinner size="xl" />
       </Center>
     );
+  }
+
+  if (verifySessionData?.verifySession?.isAuth) {
+    return <Navigate to={routes.profile} />;
   }
 
   return (
