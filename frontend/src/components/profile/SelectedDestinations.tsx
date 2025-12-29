@@ -1,6 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Grid, GridItem, Link, Spinner, Text } from "@chakra-ui/react";
+import {
+  Center,
+  Flex,
+  Grid,
+  GridItem,
+  Link,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { GlobalStore } from "../../stores";
 import { DestinationCard } from "../cards";
 import { useGetDestinations } from "../../hooks";
@@ -25,7 +33,9 @@ export const SelectedDestinations = observer(
       <Flex flexDir="column" gap={4}>
         <Text>Добавленные направления</Text>
         {destinationsLoading ? (
-          <Spinner size="xl" />
+          <Center>
+            <Spinner size="xl" />
+          </Center>
         ) : globalStore.selectedDestinations.size === 0 ? (
           <Text>
             Пока ничего не добавлено.{" "}

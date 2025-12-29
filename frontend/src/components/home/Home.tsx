@@ -1,6 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Grid, GridItem, Link, Spinner, Text } from "@chakra-ui/react";
+import {
+  Center,
+  Flex,
+  Grid,
+  GridItem,
+  Link,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { routes } from "../../config";
 import { DestinationCard } from "../cards";
 import { GlobalStore } from "../../stores";
@@ -31,7 +39,9 @@ export const Home = observer(({ globalStore }: IHome) => {
         <RouterLink to={routes.profile}>Посмотреть добавленные</RouterLink>
       </Link>
       {destinationsLoading ? (
-        <Spinner size="xl" />
+        <Center>
+          <Spinner size="xl" />
+        </Center>
       ) : (
         <Grid
           gap={4}
