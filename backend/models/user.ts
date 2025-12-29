@@ -12,14 +12,14 @@ export interface IUserSchemeAttributes {
   email: string;
   password: string;
   role: string;
-  createdAt: Date;
-  savedDestinations: DestinationId[];
+  created_at: Date;
+  saved_destinations: DestinationId[];
 }
 
 export interface IUserSchemeInput
   extends Optional<
     IUserSchemeAttributes,
-    "id" | "role" | "createdAt" | "savedDestinations"
+    "id" | "role" | "created_at" | "saved_destinations"
   > {}
 
 export interface IUserSchemeInstance
@@ -55,12 +55,12 @@ export const userScheme: ModelAttributes<
     allowNull: false,
     defaultValue: "user",
   },
-  createdAt: {
+  created_at: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-  savedDestinations: {
+  saved_destinations: {
     type: DataTypes.ARRAY(DataTypes.ENUM(...Object.values(DestinationId))),
     defaultValue: [],
   },

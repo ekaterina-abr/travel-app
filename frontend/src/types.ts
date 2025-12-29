@@ -2,8 +2,12 @@ export interface IDestinationResponse {
   id: string;
   title: string;
   description?: string;
-  isSelected?: boolean;
-  isoCode?: string;
+  iso_code: string;
+  saved_times: number;
+}
+
+export interface IDestinationsResponse {
+  destinations: IDestinationResponse[];
 }
 
 export interface INotification {

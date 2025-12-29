@@ -85,6 +85,7 @@ export const Header = observer(({ globalStore }: IHeader) => {
       </Link>
       <Flex alignItems="center" gap={4}>
         {notificationsIsLoading ? (
+          // TODO: check
           <Spinner />
         ) : (
           <Notifications

@@ -11,7 +11,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 import { resolvers } from "../graphql/resolvers/index.ts";
 import { typeDefs } from "../graphql/schemas/index.ts";
-import { destinations, notifications } from "./config/index.ts";
+import { notifications } from "./config/index.ts";
 import type { IApolloContext, INotificationWSReceivedMsg } from "../types.ts";
 import { sendWSNotification } from "./utils/index.ts";
 // import authRouter from "./routes/auth.ts";
@@ -67,10 +67,6 @@ const init = async () => {
       }),
     })
   );
-
-  app.get(`${baseRoutePath}/destinations`, (req, res) => {
-    res.json({ destinations });
-  });
 
   app.get(`${baseRoutePath}/notifications`, (req, res) => {
     res.json({ notifications });

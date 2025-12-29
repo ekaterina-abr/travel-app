@@ -7,14 +7,6 @@ export const DestinationId = {
 
 export type DestinationId = (typeof DestinationId)[keyof typeof DestinationId];
 
-export interface IDestination {
-  id: DestinationId;
-  title: string;
-  description?: string;
-  isSelected?: boolean;
-  isoCode?: string;
-}
-
 export interface INotification {
   id: number;
   text: string;

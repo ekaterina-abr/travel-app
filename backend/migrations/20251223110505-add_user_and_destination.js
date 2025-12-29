@@ -4,7 +4,6 @@ const { DestinationId } = require("../types.ts");
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    console.log("Migration UP");
     await queryInterface.createTable("users", {
       id: {
         type: Sequelize.INTEGER,

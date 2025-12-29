@@ -9,8 +9,8 @@ type User {
   email: String!
   password: String!
   role: String
-  createdAt: Date
-  savedDestinations: [DestinationId!]
+  created_at: Date
+  saved_destinations: [DestinationId!]
 }
 
 input RegisterInput {

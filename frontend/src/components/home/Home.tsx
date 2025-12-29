@@ -11,8 +11,11 @@ interface IHome {
 }
 
 export const Home = observer(({ globalStore }: IHome) => {
-  const { data: destinationsData, isLoading: destinationsIsLoading } =
-    useGetDestinations();
+  const {
+    data: destinationsData,
+    loading: destinationsLoading,
+    // error: destinationsError,
+  } = useGetDestinations();
 
   const onAddDestination = (dest: string) => {
     globalStore.addDestination(dest);
@@ -27,8 +30,8 @@ export const Home = observer(({ globalStore }: IHome) => {
       <Link asChild variant="text">
         <RouterLink to={routes.profile}>Посмотреть добавленные</RouterLink>
       </Link>
-      {destinationsIsLoading ? (
-        <Spinner />
+      {destinationsLoading ? (
+        <Spinner size="xl" />
       ) : (
         <Grid
           gap={4}

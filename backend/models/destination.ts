@@ -5,8 +5,8 @@ export interface IDestinationSchemeAttributes {
   id: DestinationId;
   title: string;
   description: string;
-  isoCode: string;
-  savedTimes: number;
+  iso_code: string;
+  saved_times: number;
 }
 
 export interface IDestinationSchemeInput extends IDestinationSchemeAttributes {}
@@ -31,11 +31,11 @@ export const destinationScheme: ModelAttributes<
   description: {
     type: DataTypes.STRING,
   },
-  isoCode: {
+  iso_code: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  savedTimes: {
+  saved_times: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },

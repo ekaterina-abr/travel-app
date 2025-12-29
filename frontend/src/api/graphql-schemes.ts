@@ -30,3 +30,15 @@ export const LOGIN_SCHEME = gql`
     }
   }
 `;
+
+export const DESTINATIONS_SCHEME = gql`
+  query destinations {
+    destinations {
+      id
+      title
+      description
+      iso_code
+      saved_times
+    }
+  }
+`;

@@ -11,8 +11,11 @@ interface ISelectedDestinations {
 
 export const SelectedDestinations = observer(
   ({ globalStore }: ISelectedDestinations) => {
-    const { data: destinationsData, isLoading: destinationsIsLoading } =
-      useGetDestinations();
+    const {
+      data: destinationsData,
+      loading: destinationsLoading,
+      // error: destinationsError,
+    } = useGetDestinations();
 
     const onRemoveDestination = (dest: string) => {
       globalStore.removeDestination(dest);
@@ -21,8 +24,8 @@ export const SelectedDestinations = observer(
     return (
       <Flex flexDir="column" gap={4}>
         <Text>Добавленные направления</Text>
-        {destinationsIsLoading ? (
-          <Spinner />
+        {destinationsLoading ? (
+          <Spinner size="xl" />
         ) : globalStore.selectedDestinations.size === 0 ? (
           <Text>
             Пока ничего не добавлено.{" "}
