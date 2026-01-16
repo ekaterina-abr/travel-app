@@ -14,8 +14,6 @@ import { typeDefs } from "../graphql/schemas/index.ts";
 import { notifications } from "./config/index.ts";
 import type { IApolloContext, INotificationWSReceivedMsg } from "../types.ts";
 import { sendWSNotification } from "./utils/index.ts";
-// import authRouter from "./routes/auth.ts";
-// import auth from "./middleware/auth.ts";
 import { db } from "../models/index.ts";
 import { sessionCookieName, sessionCookieOptions } from "../session/index.ts";
 
@@ -71,12 +69,6 @@ const init = async () => {
   app.get(`${baseRoutePath}/notifications`, (req, res) => {
     res.json({ notifications });
   });
-
-  // app.use(`${baseRoutePath}/auth`, authRouter);
-
-  // app.get("/profile", auth, (req, res) => {
-  //   res.send("This is a protected route");
-  // });
 
   const server = app.listen(PORT, async () => {
     console.log(`Server running on port ${PORT}`);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Navigate, Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,7 +21,6 @@ import {
   useMutateRegister,
   useMutateSaveDestinations,
 } from "../../hooks";
-import { graphqlClient } from "../../api";
 import { GlobalStore } from "../../stores";
 import { redirectOnAuth } from "../../utils";
 
@@ -32,11 +31,11 @@ interface ISignup {
 const inputStyles: InputProps = { size: "lg" };
 
 export const Signup = ({ globalStore }: ISignup) => {
+  const navigate = useNavigate();
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
     // error: verifySessionError,
-    refetch: verifySessionRefetch,
   } = useGetVerifySession();
 
   const [
@@ -51,9 +50,8 @@ export const Signup = ({ globalStore }: ISignup) => {
   const [saveDestinations] = useMutateSaveDestinations();
 
   useEffect(() => {
-    if (registerResultData && registerResultData?.register?.token) {
-      graphqlClient.resetStore();
-      verifySessionRefetch();
+    if (registerResultData && registerResultData?.register?.id) {
+      redirectToProfile(registerResultData.register.id);
     }
   }, [registerResultData]);
 
@@ -63,13 +61,14 @@ export const Signup = ({ globalStore }: ISignup) => {
   });
 
   const redirectToProfile = useCallback(
-    async () =>
+    async (userId: number) =>
       await redirectOnAuth({
         globalStore,
         saveDestinations,
-        verifySessionData,
+        userId,
+        navigate,
       }),
-    [globalStore, saveDestinations, verifySessionData]
+    [globalStore, saveDestinations, navigate]
   );
 
   const onSubmit = (data: SignupFormSchemaType) => {
@@ -85,7 +84,7 @@ export const Signup = ({ globalStore }: ISignup) => {
   }
 
   if (verifySessionData?.verifySession?.isAuth) {
-    redirectToProfile();
+    return <Navigate to={routes.profile} />;
   }
 
   return (

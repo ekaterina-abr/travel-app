@@ -1,12 +1,10 @@
 import { useMutation } from "@apollo/client/react";
 import { GlobalStore } from "../stores";
-import {
-  IMutateSaveDestinationsResponse,
-  IVerifySessionResponse,
-} from "../types";
+import { IMutateSaveDestinationsResponse } from "../types";
 import { ApolloCache } from "@apollo/client";
-import { Navigate } from "react-router-dom";
+import { NavigateFunction } from "react-router-dom";
 import { routes } from "../config";
+import { graphqlClient } from "../api";
 
 interface IArgs {
   globalStore: GlobalStore;
@@ -17,28 +15,31 @@ interface IArgs {
     },
     ApolloCache
   >;
-  verifySessionData?: IVerifySessionResponse;
+  userId: number;
+  navigate: NavigateFunction;
 }
 
 export const redirectOnAuth = async ({
   globalStore,
   saveDestinations,
-  verifySessionData,
+  userId,
+  navigate,
 }: IArgs) => {
   if (globalStore.selectedDestinations.size > 0) {
     try {
       await saveDestinations({
         variables: {
           input: {
-            userId: verifySessionData?.verifySession?.userId,
+            userId,
             destinationIds: [...globalStore.selectedDestinations],
           },
         },
       });
       globalStore.removeAllDestinations();
+      graphqlClient.resetStore();
     } catch (err) {
       console.error("Unable to save destinations from store, ", err);
     }
   }
-  return <Navigate to={routes.profile} />;
+  navigate(routes.profile);
 };

@@ -16,7 +16,7 @@ import {
   useGetUserInfo,
   useMutateUnsaveDestination,
 } from "../../hooks";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { removeDestination } from "../../utils";
 
 interface ISelectedDestinations {
@@ -25,6 +25,7 @@ interface ISelectedDestinations {
 
 export const SelectedDestinations = observer(
   ({ globalStore }: ISelectedDestinations) => {
+    const isInitialUserInfoLoading = useRef(true);
     const {
       loading: userInfoLoading,
       data: userInfoData,
@@ -45,6 +46,12 @@ export const SelectedDestinations = observer(
         // error: unsaveDestinationError,
       },
     ] = useMutateUnsaveDestination();
+
+    useEffect(() => {
+      if (userInfoData && isInitialUserInfoLoading.current) {
+        isInitialUserInfoLoading.current = false;
+      }
+    }, [userInfoData]);
 
     useEffect(() => {
       if (unsaveDestinationData?.unsaveDestination) {
@@ -86,7 +93,8 @@ export const SelectedDestinations = observer(
     return (
       <Flex flexDir="column" gap={4}>
         <Text>Добавленные направления</Text>
-        {userInfoLoading || destinationsLoading ? (
+        {(userInfoLoading && isInitialUserInfoLoading.current) ||
+        destinationsLoading ? (
           <Center>
             <Spinner size="xl" />
           </Center>

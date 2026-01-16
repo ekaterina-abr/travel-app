@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Navigate, Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,7 +21,6 @@ import {
   useMutateLogin,
   useMutateSaveDestinations,
 } from "../../hooks";
-import { graphqlClient } from "../../api";
 import { GlobalStore } from "../../stores";
 import { redirectOnAuth } from "../../utils";
 
@@ -32,11 +31,11 @@ interface ILogin {
 const inputStyles: InputProps = { size: "lg" };
 
 export const Login = ({ globalStore }: ILogin) => {
+  const navigate = useNavigate();
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
     // error: verifySessionError,
-    refetch: verifySessionRefetch,
   } = useGetVerifySession();
 
   const [
@@ -50,27 +49,27 @@ export const Login = ({ globalStore }: ILogin) => {
 
   const [saveDestinations] = useMutateSaveDestinations();
 
-  useEffect(() => {
-    if (loginResultData && loginResultData?.login?.token) {
-      graphqlClient.resetStore();
-      verifySessionRefetch();
-    }
-  }, [loginResultData]);
-
   const { register, handleSubmit, formState } = useForm<LoginFormSchemaType>({
     resolver: zodResolver(LoginFormSchema),
     mode: "onTouched",
   });
 
   const redirectToProfile = useCallback(
-    async () =>
+    async (userId: number) =>
       await redirectOnAuth({
         globalStore,
         saveDestinations,
-        verifySessionData,
+        userId,
+        navigate,
       }),
-    [globalStore, saveDestinations, verifySessionData]
+    [globalStore, saveDestinations, navigate]
   );
+
+  useEffect(() => {
+    if (loginResultData && loginResultData?.login?.id) {
+      redirectToProfile(loginResultData.login.id);
+    }
+  }, [loginResultData]);
 
   const onSubmit = (data: LoginFormSchemaType) => {
     login({ variables: { input: data } });
@@ -85,7 +84,7 @@ export const Login = ({ globalStore }: ILogin) => {
   }
 
   if (verifySessionData?.verifySession?.isAuth) {
-    redirectToProfile();
+    return <Navigate to={routes.profile} />;
   }
 
   return (

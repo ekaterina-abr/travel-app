@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
 import {
@@ -29,6 +29,7 @@ export const Home = observer(({ globalStore }: IHome) => {
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>(
     []
   );
+  const isInitialUserInfoLoading = useRef(true);
   const {
     loading: userInfoLoading,
     data: userInfoData,
@@ -60,6 +61,9 @@ export const Home = observer(({ globalStore }: IHome) => {
 
   // receive destinations from db
   useEffect(() => {
+    if (userInfoData && isInitialUserInfoLoading.current) {
+      isInitialUserInfoLoading.current = false;
+    }
     if (
       userInfoData?.getUserInfo?.saved_destinations?.length &&
       destinationsData?.destinations
@@ -90,10 +94,7 @@ export const Home = observer(({ globalStore }: IHome) => {
     }
   }, [unsaveDestinationData]);
 
-  const isAuth = useMemo(() => {
-    console.log("return isAuth", !!userInfoData?.getUserInfo?.id);
-    return !!userInfoData?.getUserInfo?.id;
-  }, [userInfoData]);
+  const isAuth = useMemo(() => !!userInfoData?.getUserInfo?.id, [userInfoData]);
 
   const onAddDestination = useCallback(
     async (dest: string) =>
@@ -127,7 +128,8 @@ export const Home = observer(({ globalStore }: IHome) => {
       <Link asChild variant="text">
         <RouterLink to={routes.profile}>Посмотреть добавленные</RouterLink>
       </Link>
-      {destinationsLoading || userInfoLoading ? (
+      {destinationsLoading ||
+      (userInfoLoading && isInitialUserInfoLoading.current) ? (
         <Center>
           <Spinner size="xl" />
         </Center>

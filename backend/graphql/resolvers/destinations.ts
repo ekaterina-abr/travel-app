@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
-import { Op } from "sequelize";
-import { Destination, User } from "../../models/index.ts";
-import type { DestinationId, IApolloContext } from "../../types.ts";
+import { Op, Sequelize } from "sequelize";
+import { db, Destination, User } from "../../models/index.ts";
+import { DestinationId, type IApolloContext } from "../../types.ts";
 
 export interface ISaveDestinationsArgs {
   input: {
@@ -20,7 +20,9 @@ export interface IUnsaveDestinationArgs {
 export const destinationsResolver = {
   Query: {
     async destinations(parent: any, args: null, context: IApolloContext) {
-      return await Destination.findAll();
+      return await Destination.findAll({
+        order: (db.sequelize as Sequelize).col("iso_code"),
+      });
     },
   },
   Mutation: {
@@ -36,11 +38,16 @@ export const destinationsResolver = {
         throw new GraphQLError(`Пользователя с id=${userId} не существует`);
       }
 
-      user.saved_destinations.concat(destinationIds);
-      const userUpdated = await user.save();
+      const newDestinations = destinationIds.filter(
+        (dest) => !user.saved_destinations.includes(dest)
+      );
+      const allDestinations = user.saved_destinations.concat(newDestinations);
+      const userUpdated = await user.update({
+        saved_destinations: allDestinations,
+      });
 
       await Destination.increment("saved_times", {
-        where: { id: { [Op.or]: destinationIds } },
+        where: { id: { [Op.or]: newDestinations } },
       });
       return { userId: userUpdated.id, savedDestinations: destinationIds };
     },
@@ -56,8 +63,12 @@ export const destinationsResolver = {
         throw new GraphQLError(`Пользователя с id=${userId} не существует`);
       }
 
-      user.saved_destinations.filter((ids) => ids !== destinationId);
-      const userUpdated = await user.save();
+      const filteredDestinations = [...user.saved_destinations].filter(
+        (ids) => ids !== destinationId
+      );
+      const userUpdated = await user.update({
+        saved_destinations: filteredDestinations,
+      });
 
       await Destination.decrement("saved_times", {
         where: { id: destinationId },
