@@ -34,6 +34,17 @@ export interface IVerifySessionResponse {
   };
 }
 
+export interface IGetUserInfoResponse {
+  getUserInfo: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+    created_at: Date;
+    saved_destinations: string[];
+  };
+}
+
 export interface IMutateRegisterResponse {
   register: {
     id: number;
@@ -55,5 +66,19 @@ export interface IMutateLogoutResponse {
   logout: {
     isAuth: boolean;
     userId?: number;
+  };
+}
+
+export interface IMutateSaveDestinationsResponse {
+  saveDestinations: {
+    userId: number;
+    savedDestinations: string[];
+  };
+}
+
+export interface IMutateUnsaveDestinationResponse {
+  unsaveDestination: {
+    userId: number;
+    unsavedDestination: string;
   };
 }

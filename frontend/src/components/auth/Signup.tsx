@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Navigate, Link as RouterLink } from "react-router-dom";
+import { useCallback, useEffect } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,16 +16,27 @@ import {
 } from "@chakra-ui/react";
 import { SignupFormSchema, SignupFormSchemaType } from "../../zod-schemes";
 import { routes } from "../../config";
-import { useGetVerifySession, useMutateRegister } from "../../hooks";
+import {
+  useGetVerifySession,
+  useMutateRegister,
+  useMutateSaveDestinations,
+} from "../../hooks";
 import { graphqlClient } from "../../api";
+import { GlobalStore } from "../../stores";
+import { redirectOnAuth } from "../../utils";
+
+interface ISignup {
+  globalStore: GlobalStore;
+}
 
 const inputStyles: InputProps = { size: "lg" };
 
-export const Signup = () => {
+export const Signup = ({ globalStore }: ISignup) => {
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
     // error: verifySessionError,
+    refetch: verifySessionRefetch,
   } = useGetVerifySession();
 
   const [
@@ -37,9 +48,12 @@ export const Signup = () => {
     },
   ] = useMutateRegister();
 
+  const [saveDestinations] = useMutateSaveDestinations();
+
   useEffect(() => {
     if (registerResultData && registerResultData?.register?.token) {
       graphqlClient.resetStore();
+      verifySessionRefetch();
     }
   }, [registerResultData]);
 
@@ -47,6 +61,16 @@ export const Signup = () => {
     resolver: zodResolver(SignupFormSchema),
     mode: "onTouched",
   });
+
+  const redirectToProfile = useCallback(
+    async () =>
+      await redirectOnAuth({
+        globalStore,
+        saveDestinations,
+        verifySessionData,
+      }),
+    [globalStore, saveDestinations, verifySessionData]
+  );
 
   const onSubmit = (data: SignupFormSchemaType) => {
     mutateRegister({ variables: { input: data } });
@@ -61,7 +85,7 @@ export const Signup = () => {
   }
 
   if (verifySessionData?.verifySession?.isAuth) {
-    return <Navigate to={routes.profile} />;
+    redirectToProfile();
   }
 
   return (

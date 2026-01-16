@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Navigate, Link as RouterLink } from "react-router-dom";
+import { useCallback, useEffect } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,16 +16,27 @@ import {
 } from "@chakra-ui/react";
 import { LoginFormSchema, LoginFormSchemaType } from "../../zod-schemes";
 import { routes } from "../../config";
-import { useGetVerifySession, useMutateLogin } from "../../hooks";
+import {
+  useGetVerifySession,
+  useMutateLogin,
+  useMutateSaveDestinations,
+} from "../../hooks";
 import { graphqlClient } from "../../api";
+import { GlobalStore } from "../../stores";
+import { redirectOnAuth } from "../../utils";
+
+interface ILogin {
+  globalStore: GlobalStore;
+}
 
 const inputStyles: InputProps = { size: "lg" };
 
-export const Login = () => {
+export const Login = ({ globalStore }: ILogin) => {
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
     // error: verifySessionError,
+    refetch: verifySessionRefetch,
   } = useGetVerifySession();
 
   const [
@@ -37,9 +48,12 @@ export const Login = () => {
     },
   ] = useMutateLogin();
 
+  const [saveDestinations] = useMutateSaveDestinations();
+
   useEffect(() => {
     if (loginResultData && loginResultData?.login?.token) {
       graphqlClient.resetStore();
+      verifySessionRefetch();
     }
   }, [loginResultData]);
 
@@ -47,6 +61,16 @@ export const Login = () => {
     resolver: zodResolver(LoginFormSchema),
     mode: "onTouched",
   });
+
+  const redirectToProfile = useCallback(
+    async () =>
+      await redirectOnAuth({
+        globalStore,
+        saveDestinations,
+        verifySessionData,
+      }),
+    [globalStore, saveDestinations, verifySessionData]
+  );
 
   const onSubmit = (data: LoginFormSchemaType) => {
     login({ variables: { input: data } });
@@ -61,7 +85,7 @@ export const Login = () => {
   }
 
   if (verifySessionData?.verifySession?.isAuth) {
-    return <Navigate to={routes.profile} />;
+    redirectToProfile();
   }
 
   return (

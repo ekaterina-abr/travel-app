@@ -28,6 +28,22 @@ export const authResolver = {
     async verifySession(parent: any, args: null, context: IApolloContext) {
       return await _verifySession(context.session);
     },
+    async getUserInfo(parent: any, args: null, context: IApolloContext) {
+      const session = await _verifySession(context.session);
+      console.log("getUserInfo session.userId", session.userId);
+
+      if (session.userId) {
+        const user = await User.findOne({ where: { id: session.userId } });
+
+        if (!user) {
+          throw new GraphQLError("Ошибка получения информации о пользователе");
+        }
+
+        const { id, name, email, role, created_at, saved_destinations } = user;
+        return { id, name, email, role, created_at, saved_destinations };
+      }
+      return null;
+    },
   },
   Mutation: {
     async register(parent: any, args: IRegisterArgs, context: IApolloContext) {

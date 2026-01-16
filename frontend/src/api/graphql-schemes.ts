@@ -9,6 +9,19 @@ export const VERIFY_SESSION_SCHEME = gql`
   }
 `;
 
+export const GET_USER_INFO_SCHEME = gql`
+  query getUserInfo {
+    getUserInfo {
+      id
+      name
+      email
+      role
+      created_at
+      saved_destinations
+    }
+  }
+`;
+
 export const REGISTER_SCHEME = gql`
   mutation register($input: RegisterInput!) {
     register(input: $input) {
@@ -48,6 +61,24 @@ export const LOGOUT_SCHEME = gql`
     logout {
       isAuth
       userId
+    }
+  }
+`;
+
+export const SAVE_DESTINATIONS_SCHEME = gql`
+  mutation saveDestinations($input: SaveDestinationsInput!) {
+    saveDestinations(input: $input) {
+      userId
+      savedDestinations
+    }
+  }
+`;
+
+export const UNSAVE_DESTINATION_SCHEME = gql`
+  mutation unsaveDestination($input: UnsaveDestinationInput!) {
+    unsaveDestination(input: $input) {
+      userId
+      unsavedDestination
     }
   }
 `;

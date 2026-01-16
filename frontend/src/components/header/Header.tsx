@@ -4,9 +4,10 @@ import { Flex, Link, Spinner, Text } from "@chakra-ui/react";
 import { CalendarStar } from "@phosphor-icons/react";
 import { GlobalStore } from "../../stores";
 import { routes } from "../../config";
-import { useGetVerifySession } from "../../hooks";
+import { useGetUserInfo } from "../../hooks";
 import { NotificationsBlock } from "./NotificationsBlock";
 import { Logout } from "./Logout";
+import { useMemo } from "react";
 
 interface IHeader {
   globalStore: GlobalStore;
@@ -14,10 +15,29 @@ interface IHeader {
 
 export const Header = observer(({ globalStore }: IHeader) => {
   const {
-    loading: verifySessionLoading,
-    data: verifySessionData,
-    // error: verifySessionError,
-  } = useGetVerifySession();
+    loading: userInfoLoading,
+    data: userInfoData,
+    // error: userInfoError,
+  } = useGetUserInfo();
+
+  const isAuth = useMemo(() => !!userInfoData?.getUserInfo?.id, [userInfoData]);
+
+  const selectedDestinations = useMemo(() => {
+    console.log(
+      "globalStore.selectedDestinations",
+      globalStore.selectedDestinations.size
+    );
+    if (isAuth) {
+      return userInfoData!.getUserInfo.saved_destinations;
+    } else {
+      return [...globalStore.selectedDestinations];
+    }
+  }, [
+    isAuth,
+    userInfoData,
+    globalStore.selectedDestinations,
+    globalStore.selectedDestinations.size,
+  ]);
 
   return (
     <Flex
@@ -30,9 +50,9 @@ export const Header = observer(({ globalStore }: IHeader) => {
         <RouterLink to="/">Главная</RouterLink>
       </Link>
       <Flex alignItems="center" gap={2}>
-        {verifySessionLoading ? (
+        {userInfoLoading ? (
           <Spinner />
-        ) : verifySessionData?.verifySession?.isAuth ? (
+        ) : isAuth ? (
           <NotificationsBlock />
         ) : (
           <Link asChild color="darkBlue">
@@ -43,11 +63,11 @@ export const Header = observer(({ globalStore }: IHeader) => {
           <RouterLink to={routes.profile}>
             <Flex alignItems="center" gap={1}>
               <CalendarStar weight="fill" size={24} />
-              <Text fontSize="lg">{globalStore.selectedDestinations.size}</Text>
+              <Text fontSize="lg">{selectedDestinations.length}</Text>
             </Flex>
           </RouterLink>
         </Link>
-        {verifySessionData?.verifySession?.isAuth && <Logout />}
+        {isAuth && <Logout />}
       </Flex>
     </Flex>
   );

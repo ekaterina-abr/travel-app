@@ -22,8 +22,14 @@ function App() {
                 path={routes.profile}
                 element={<Profile globalStore={globalStore} />}
               />
-              <Route path={routes.signup} element={<Signup />} />
-              <Route path={routes.login} element={<Login />} />
+              <Route
+                path={routes.signup}
+                element={<Signup globalStore={globalStore} />}
+              />
+              <Route
+                path={routes.login}
+                element={<Login globalStore={globalStore} />}
+              />
             </Routes>
           </ChakraProvider>
         </BrowserRouter>

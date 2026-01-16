@@ -42,6 +42,15 @@ type Session {
   userId: Int
 }
 
+type UserInfo {
+  id: Int!
+  name: String!
+  email: String!
+  role: String!
+  created_at: Date!
+  saved_destinations: [DestinationId!]!
+}
+
 type Mutation {
   register(input: RegisterInput!): RegisterResponse
   login(input: LoginInput!): LoginResponse
@@ -50,5 +59,6 @@ type Mutation {
 
 type Query {
   verifySession: Session!
+  getUserInfo: UserInfo
 }
 `;
