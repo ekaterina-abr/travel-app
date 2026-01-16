@@ -23,10 +23,6 @@ export const Header = observer(({ globalStore }: IHeader) => {
   const isAuth = useMemo(() => !!userInfoData?.getUserInfo?.id, [userInfoData]);
 
   const selectedDestinations = useMemo(() => {
-    console.log(
-      "globalStore.selectedDestinations",
-      globalStore.selectedDestinations.size
-    );
     if (isAuth) {
       return userInfoData!.getUserInfo.saved_destinations;
     } else {

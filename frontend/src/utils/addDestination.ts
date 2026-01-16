@@ -31,8 +31,6 @@ export const addDestination = async ({
   userInfoData,
   userInfoRefetch,
 }: IArgs) => {
-  // TODO: remove
-  console.log("isAuth", isAuth);
   if (isAuth) {
     await saveDestinations({
       variables: {
@@ -42,7 +40,6 @@ export const addDestination = async ({
         },
       },
     });
-    console.log("saving destinations to db");
     await userInfoRefetch();
   } else {
     globalStore.addDestination(dest);
