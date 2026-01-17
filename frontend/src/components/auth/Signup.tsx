@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Navigate, Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +22,7 @@ import {
   useMutateSaveDestinations,
 } from "../../hooks";
 import { GlobalStore } from "../../stores";
-import { redirectOnAuth } from "../../utils";
+import { isUserExistsRegisterError, redirectOnAuth } from "../../utils";
 import { ErrorAlert } from "../alert";
 
 interface ISignup {
@@ -50,16 +50,27 @@ export const Signup = ({ globalStore }: ISignup) => {
 
   const [saveDestinations] = useMutateSaveDestinations();
 
+  const isUserExistsError = useMemo(
+    () => isUserExistsRegisterError(registerError?.message),
+    [registerError?.message]
+  );
+
+  const { register, handleSubmit, formState, setError } =
+    useForm<SignupFormSchemaType>({
+      resolver: zodResolver(SignupFormSchema),
+      mode: "onTouched",
+    });
+
   useEffect(() => {
     if (registerResultData && registerResultData?.register?.id) {
       redirectToProfile(registerResultData.register.id);
     }
   }, [registerResultData]);
 
-  const { register, handleSubmit, formState } = useForm<SignupFormSchemaType>({
-    resolver: zodResolver(SignupFormSchema),
-    mode: "onTouched",
-  });
+  useEffect(() => {
+    const errorObj = { message: registerError?.message, type: "string" };
+    if (isUserExistsError) setError("email", errorObj);
+  }, [isUserExistsError]);
 
   const redirectToProfile = useCallback(
     async (userId: number) =>
@@ -76,6 +87,9 @@ export const Signup = ({ globalStore }: ISignup) => {
     mutateRegister({ variables: { input: data } });
   };
 
+  const isShowErrorAlert =
+    verifySessionError || (registerError && !isUserExistsError);
+
   if (verifySessionLoading) {
     return (
       <Center h="80vh">
@@ -90,7 +104,7 @@ export const Signup = ({ globalStore }: ISignup) => {
 
   return (
     <Flex py={5} px={4} justifyContent="center">
-      {(verifySessionError || registerError) && <ErrorAlert />}
+      {isShowErrorAlert && <ErrorAlert />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex
           direction="column"

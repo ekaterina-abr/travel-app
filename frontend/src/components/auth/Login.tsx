@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Navigate, Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,8 +22,9 @@ import {
   useMutateSaveDestinations,
 } from "../../hooks";
 import { GlobalStore } from "../../stores";
-import { redirectOnAuth } from "../../utils";
+import { isWrongPasswordLoginError, redirectOnAuth } from "../../utils";
 import { ErrorAlert } from "../alert";
+import { isEmailNotExistLoginError } from "../../utils";
 
 interface ILogin {
   globalStore: GlobalStore;
@@ -44,12 +45,21 @@ export const Login = ({ globalStore }: ILogin) => {
     { data: loginResultData, loading: loginLoading, error: loginError },
   ] = useMutateLogin();
 
+  const [isEmailNotExistError, isWrongPasswordError] = useMemo(
+    () => [
+      isEmailNotExistLoginError(loginError?.message),
+      isWrongPasswordLoginError(loginError?.message),
+    ],
+    [loginError]
+  );
+
   const [saveDestinations] = useMutateSaveDestinations();
 
-  const { register, handleSubmit, formState } = useForm<LoginFormSchemaType>({
-    resolver: zodResolver(LoginFormSchema),
-    mode: "onTouched",
-  });
+  const { register, handleSubmit, formState, setError } =
+    useForm<LoginFormSchemaType>({
+      resolver: zodResolver(LoginFormSchema),
+      mode: "onTouched",
+    });
 
   const redirectToProfile = useCallback(
     async (userId: number) =>
@@ -68,9 +78,19 @@ export const Login = ({ globalStore }: ILogin) => {
     }
   }, [loginResultData]);
 
+  useEffect(() => {
+    const errorObj = { message: loginError?.message, type: "string" };
+    if (isEmailNotExistError) setError("email", errorObj);
+    if (isWrongPasswordError) setError("password", errorObj);
+  }, [isEmailNotExistError, isWrongPasswordError]);
+
   const onSubmit = (data: LoginFormSchemaType) => {
     login({ variables: { input: data } });
   };
+
+  const isShowErrorAlert =
+    verifySessionError ||
+    (loginError && !isEmailNotExistError && !isWrongPasswordError);
 
   if (verifySessionLoading) {
     return (
@@ -86,7 +106,7 @@ export const Login = ({ globalStore }: ILogin) => {
 
   return (
     <Flex py={5} px={4} justifyContent="center">
-      {(verifySessionError || loginError) && <ErrorAlert />}
+      {isShowErrorAlert && <ErrorAlert />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex
           direction="column"
