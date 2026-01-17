@@ -23,6 +23,7 @@ import {
 } from "../../hooks";
 import { GlobalStore } from "../../stores";
 import { redirectOnAuth } from "../../utils";
+import { ErrorAlert } from "../alert";
 
 interface ISignup {
   globalStore: GlobalStore;
@@ -35,7 +36,7 @@ export const Signup = ({ globalStore }: ISignup) => {
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
-    // error: verifySessionError,
+    error: verifySessionError,
   } = useGetVerifySession();
 
   const [
@@ -43,7 +44,7 @@ export const Signup = ({ globalStore }: ISignup) => {
     {
       data: registerResultData,
       loading: registerLoading,
-      // error: registerError,
+      error: registerError,
     },
   ] = useMutateRegister();
 
@@ -89,6 +90,7 @@ export const Signup = ({ globalStore }: ISignup) => {
 
   return (
     <Flex py={5} px={4} justifyContent="center">
+      {(verifySessionError || registerError) && <ErrorAlert />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex
           direction="column"

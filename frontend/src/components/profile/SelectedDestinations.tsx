@@ -18,6 +18,7 @@ import {
 } from "../../hooks";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { removeDestination } from "../../utils";
+import { ErrorAlert } from "../alert";
 
 interface ISelectedDestinations {
   globalStore: GlobalStore;
@@ -29,22 +30,19 @@ export const SelectedDestinations = observer(
     const {
       loading: userInfoLoading,
       data: userInfoData,
-      // error: userInfoError,
+      error: userInfoError,
       refetch: userInfoRefetch,
     } = useGetUserInfo();
 
     const {
       data: destinationsData,
       loading: destinationsLoading,
-      // error: destinationsError,
+      error: destinationsError,
     } = useGetDestinations();
 
     const [
       unsaveDestination,
-      {
-        data: unsaveDestinationData,
-        // error: unsaveDestinationError,
-      },
+      { data: unsaveDestinationData, error: unsaveDestinationError },
     ] = useMutateUnsaveDestination();
 
     useEffect(() => {
@@ -92,6 +90,9 @@ export const SelectedDestinations = observer(
 
     return (
       <Flex flexDir="column" gap={4}>
+        {(userInfoError || destinationsError || unsaveDestinationError) && (
+          <ErrorAlert />
+        )}
         <Text>Добавленные направления</Text>
         {(userInfoLoading && isInitialUserInfoLoading.current) ||
         destinationsLoading ? (

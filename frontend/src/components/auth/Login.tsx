@@ -23,6 +23,7 @@ import {
 } from "../../hooks";
 import { GlobalStore } from "../../stores";
 import { redirectOnAuth } from "../../utils";
+import { ErrorAlert } from "../alert";
 
 interface ILogin {
   globalStore: GlobalStore;
@@ -35,16 +36,12 @@ export const Login = ({ globalStore }: ILogin) => {
   const {
     loading: verifySessionLoading,
     data: verifySessionData,
-    // error: verifySessionError,
+    error: verifySessionError,
   } = useGetVerifySession();
 
   const [
     login,
-    {
-      data: loginResultData,
-      loading: loginLoading,
-      // error: loginError,
-    },
+    { data: loginResultData, loading: loginLoading, error: loginError },
   ] = useMutateLogin();
 
   const [saveDestinations] = useMutateSaveDestinations();
@@ -89,6 +86,7 @@ export const Login = ({ globalStore }: ILogin) => {
 
   return (
     <Flex py={5} px={4} justifyContent="center">
+      {(verifySessionError || loginError) && <ErrorAlert />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex
           direction="column"

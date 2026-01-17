@@ -20,6 +20,7 @@ import {
   useMutateUnsaveDestination,
 } from "../../hooks";
 import { addDestination, removeDestination } from "../../utils";
+import { ErrorAlert } from "../alert";
 
 interface IHome {
   globalStore: GlobalStore;
@@ -33,30 +34,24 @@ export const Home = observer(({ globalStore }: IHome) => {
   const {
     loading: userInfoLoading,
     data: userInfoData,
-    // error: userInfoError,
+    error: userInfoError,
     refetch: userInfoRefetch,
   } = useGetUserInfo();
 
   const {
     data: destinationsData,
     loading: destinationsLoading,
-    // error: destinationsError,
+    error: destinationsError,
   } = useGetDestinations();
 
   const [
     saveDestinations,
-    {
-      data: saveDestinationsData,
-      // error: saveDestinationsError,
-    },
+    { data: saveDestinationsData, error: saveDestinationsError },
   ] = useMutateSaveDestinations();
 
   const [
     unsaveDestination,
-    {
-      data: unsaveDestinationData,
-      // error: unsaveDestinationError,
-    },
+    { data: unsaveDestinationData, error: unsaveDestinationError },
   ] = useMutateUnsaveDestination();
 
   // receive destinations from db
@@ -124,6 +119,10 @@ export const Home = observer(({ globalStore }: IHome) => {
 
   return (
     <Flex py={5} px={4} flexDir="column" gap={4}>
+      {(userInfoError ||
+        destinationsError ||
+        saveDestinationsError ||
+        unsaveDestinationError) && <ErrorAlert />}
       <Text>Направления</Text>
       <Link asChild variant="text">
         <RouterLink to={routes.profile}>Посмотреть добавленные</RouterLink>
