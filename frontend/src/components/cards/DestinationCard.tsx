@@ -5,7 +5,8 @@ import { IDestinationResponse } from "../../types";
 
 interface IDestinationCard
   extends IDestinationResponse,
-    Omit<FlexProps, "title"> {
+    Omit<FlexProps, "title" | "id"> {
+  isSelected?: boolean;
   onAdd?: () => void;
   onRemove?: () => void;
   onRemoveCaption?: string;
@@ -17,7 +18,7 @@ export const DestinationCard = ({
   title,
   description,
   isSelected = false,
-  isoCode,
+  iso_code,
   onAdd = () => {},
   onRemove = () => {},
   onRemoveCaption = "Добавлено",
@@ -25,7 +26,7 @@ export const DestinationCard = ({
   ...other
 }: IDestinationCard) => {
   const toggleIconStyles: IconProps = { color: "black" };
-  const Flag = isoCode ? flags[isoCode as keyof typeof flags] : undefined;
+  const Flag = iso_code ? flags[iso_code as keyof typeof flags] : undefined;
 
   return (
     <Flex

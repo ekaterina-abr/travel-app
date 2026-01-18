@@ -1,6 +1,6 @@
 import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
 import { colors } from "./colors";
-import { linkRecipe } from "./recipes";
+import { fieldRecipe, linkRecipe } from "./recipes";
 
 const config = defineConfig({
   theme: {
@@ -9,6 +9,9 @@ const config = defineConfig({
     },
     recipes: {
       link: linkRecipe,
+    },
+    slotRecipes: {
+      field: fieldRecipe,
     },
   },
   globalCss: {
@@ -20,4 +23,5 @@ const config = defineConfig({
   },
 });
 
-export const theme = createSystem(defaultConfig, config);
+const theme = createSystem(defaultConfig, config);
+export default theme;

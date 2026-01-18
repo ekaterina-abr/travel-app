@@ -1,4 +1,4 @@
-import type { INotification } from "../types.js";
+import type { INotification } from "../../types.ts";
 
 export const notifications: INotification[] = [
   {

@@ -14,4 +14,8 @@ export class GlobalStore {
   removeDestination(dest: string) {
     this.selectedDestinations.delete(dest);
   }
+
+  removeAllDestinations() {
+    this.selectedDestinations.clear();
+  }
 }

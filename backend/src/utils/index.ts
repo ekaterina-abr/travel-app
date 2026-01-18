@@ -1,1 +1,1 @@
-export * from "./sendWSNotification.js";
+export * from "./sendWSNotification.ts";

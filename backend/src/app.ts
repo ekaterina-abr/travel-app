@@ -1,63 +1,125 @@
 import express from "express";
-import cors from "cors";
+import cors, {
+  type CorsOptions,
+  type CorsOptionsDelegate,
+  type CorsRequest,
+} from "cors";
 import { WebSocketServer } from "ws";
-import { destinations, notifications } from "./config/index.js";
-import type { INotificationWSReceivedMsg } from "./types.js";
-import { sendWSNotification } from "./utils/index.js";
+import type { Sequelize } from "sequelize";
+import cookieParser from "cookie-parser";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@as-integrations/express5";
+import { resolvers } from "../graphql/resolvers/index.ts";
+import { typeDefs } from "../graphql/schemas/index.ts";
+import { notifications } from "./config/index.ts";
+import type { IApolloContext, INotificationWSReceivedMsg } from "../types.ts";
+import { sendWSNotification } from "./utils/index.ts";
+import { db } from "../models/index.ts";
+import { sessionCookieName, sessionCookieOptions } from "../session/index.ts";
 
 const PORT = 3001;
 const baseRoutePath = "/api";
-const app = express();
+const graphqlRoutePath = `${baseRoutePath}/gql`;
+const frontendOrigin = "http://localhost:5173";
 
-app.use(cors());
+const corsOptions: CorsOptions = {
+  origin: frontendOrigin,
+  credentials: true,
+};
 
-app.get(`${baseRoutePath}/destinations`, (request, response) => {
-  response.json({ destinations });
-});
+const dynamicCorsOptions: CorsOptionsDelegate<CorsRequest & { path: string }> =
+  function (req, callback) {
+    let _corsOptions;
+    if (req.path.startsWith(graphqlRoutePath)) {
+      _corsOptions = corsOptions;
+    } else {
+      _corsOptions = { origin: "*" };
+    }
+    callback(null, _corsOptions);
+  };
 
-app.get(`${baseRoutePath}/notifications`, (request, response) => {
-  response.json({ notifications });
-});
+const init = async () => {
+  const app = express();
+  app.use(cors(dynamicCorsOptions), express.json(), cookieParser());
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  const apolloServer = new ApolloServer<IApolloContext>({
+    typeDefs,
+    resolvers,
+  });
 
-const wsServer = new WebSocketServer({
-  server,
-  path: `${baseRoutePath}/update-notifications`,
-});
+  await apolloServer.start();
 
-wsServer.on("connection", (ws) => {
-  console.log("Client connected");
+  app.options(graphqlRoutePath, cors(corsOptions));
 
-  ws.on("message", (msg) => {
-    const msgObj = JSON.parse(msg.toString()) as INotificationWSReceivedMsg;
-    if (msgObj.type === "mark-read") {
-      const notification = notifications.find((item) => item.id === msgObj.id);
-      if (notification) {
-        notification.isRead = true;
-      }
+  app.use(
+    graphqlRoutePath,
+    expressMiddleware(apolloServer, {
+      context: async ({ req, res }): Promise<IApolloContext> => ({
+        session: req.cookies[sessionCookieName] || "",
+        setSession: (session: string, expiresAt: Date) => {
+          res.cookie("session", session, {
+            ...sessionCookieOptions,
+            expires: expiresAt,
+          });
+        },
+      }),
+    })
+  );
+
+  app.get(`${baseRoutePath}/notifications`, (req, res) => {
+    res.json({ notifications });
+  });
+
+  const server = app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+    try {
+      await (db?.sequelize as Sequelize | undefined)?.authenticate();
+      console.log("Connection to db established");
+    } catch (e) {
+      console.log("Unable to connect to db: ", JSON.stringify(e));
     }
   });
 
-  ws.on("close", () => {
-    console.log("Client disconnected");
+  const wsServer = new WebSocketServer({
+    server,
+    path: `${baseRoutePath}/update-notifications`,
   });
 
-  setTimeout(() => {
-    sendWSNotification({
-      text: "Турция остается наиболее популярным направлением для туризма в 2025 году.",
-      notifications,
-      ws,
-    });
-  }, 10000);
+  wsServer.on("connection", (ws) => {
+    console.log("Client connected");
 
-  setTimeout(() => {
-    sendWSNotification({
-      text: "Карты 'Мир' заработают в Таиланде в ближайшее время.",
-      notifications,
-      ws,
+    ws.on("message", (msg) => {
+      const msgObj = JSON.parse(msg.toString()) as INotificationWSReceivedMsg;
+      if (msgObj.type === "mark-read") {
+        const notification = notifications.find(
+          (item) => item.id === msgObj.id
+        );
+        if (notification) {
+          notification.isRead = true;
+        }
+      }
     });
-  }, 40000);
-});
+
+    ws.on("close", () => {
+      console.log("Client disconnected");
+    });
+
+    setTimeout(() => {
+      sendWSNotification({
+        text: "Турция остается наиболее популярным направлением для туризма в 2025 году.",
+        notifications,
+        ws,
+      });
+    }, 10000);
+
+    setTimeout(() => {
+      sendWSNotification({
+        text: "Карты 'Мир' заработают в Таиланде в ближайшее время.",
+        notifications,
+        ws,
+      });
+    }, 40000);
+  });
+};
+
+init();

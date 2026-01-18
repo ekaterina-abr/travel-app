@@ -1,9 +1,24 @@
 import { observer } from "mobx-react-lite";
 import { Link as RouterLink } from "react-router-dom";
-import { Flex, Grid, GridItem, Link, Spinner, Text } from "@chakra-ui/react";
+import {
+  Center,
+  Flex,
+  Grid,
+  GridItem,
+  Link,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { GlobalStore } from "../../stores";
 import { DestinationCard } from "../cards";
-import { useGetDestinations } from "../../hooks";
+import {
+  useGetDestinations,
+  useGetUserInfo,
+  useMutateUnsaveDestination,
+} from "../../hooks";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { removeDestination } from "../../utils";
+import { ErrorAlert } from "../alert";
 
 interface ISelectedDestinations {
   globalStore: GlobalStore;
@@ -11,19 +26,80 @@ interface ISelectedDestinations {
 
 export const SelectedDestinations = observer(
   ({ globalStore }: ISelectedDestinations) => {
-    const { data: destinationsData, isLoading: destinationsIsLoading } =
-      useGetDestinations();
+    const isInitialUserInfoLoading = useRef(true);
+    const {
+      loading: userInfoLoading,
+      data: userInfoData,
+      error: userInfoError,
+      refetch: userInfoRefetch,
+    } = useGetUserInfo();
 
-    const onRemoveDestination = (dest: string) => {
-      globalStore.removeDestination(dest);
-    };
+    const {
+      data: destinationsData,
+      loading: destinationsLoading,
+      error: destinationsError,
+    } = useGetDestinations();
+
+    const [
+      unsaveDestination,
+      { data: unsaveDestinationData, error: unsaveDestinationError },
+    ] = useMutateUnsaveDestination();
+
+    useEffect(() => {
+      if (userInfoData && isInitialUserInfoLoading.current) {
+        isInitialUserInfoLoading.current = false;
+      }
+    }, [userInfoData]);
+
+    useEffect(() => {
+      if (unsaveDestinationData?.unsaveDestination) {
+        userInfoRefetch();
+      }
+    }, [userInfoRefetch, unsaveDestinationData?.unsaveDestination]);
+
+    const isAuth = useMemo(
+      () => !!userInfoData?.getUserInfo?.id,
+      [userInfoData]
+    );
+
+    const selectedDestinations = useMemo(() => {
+      if (isAuth) {
+        return userInfoData!.getUserInfo.saved_destinations;
+      } else {
+        return [...globalStore.selectedDestinations];
+      }
+    }, [
+      isAuth,
+      userInfoData,
+      globalStore.selectedDestinations,
+      globalStore.selectedDestinations.size,
+    ]);
+
+    const onRemoveDestination = useCallback(
+      async (dest: string) =>
+        await removeDestination({
+          dest,
+          isAuth,
+          unsaveDestination,
+          globalStore,
+          userInfoData,
+          userInfoRefetch,
+        }),
+      [isAuth, globalStore, unsaveDestination, userInfoData, userInfoRefetch]
+    );
 
     return (
       <Flex flexDir="column" gap={4}>
+        {(userInfoError || destinationsError || unsaveDestinationError) && (
+          <ErrorAlert />
+        )}
         <Text>Добавленные направления</Text>
-        {destinationsIsLoading ? (
-          <Spinner />
-        ) : globalStore.selectedDestinations.size === 0 ? (
+        {(userInfoLoading && isInitialUserInfoLoading.current) ||
+        destinationsLoading ? (
+          <Center>
+            <Spinner size="xl" />
+          </Center>
+        ) : selectedDestinations.length === 0 ? (
           <Text>
             Пока ничего не добавлено.{" "}
             <Link asChild variant="text">
@@ -40,7 +116,7 @@ export const SelectedDestinations = observer(
               "repeat(4, 1fr)",
             ]}
           >
-            {[...globalStore.selectedDestinations].map((destId) => {
+            {selectedDestinations.map((destId) => {
               const destInfo = destinationsData?.destinations?.find(
                 (_dest) => _dest.id === destId
               );

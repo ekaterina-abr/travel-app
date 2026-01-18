@@ -11,6 +11,7 @@ const apiUrls: Record<string, string> = {
   destinations: "/destinations",
   notifications: "/notifications",
   updateNotifications: `${wsBaseUrl}/update-notifications`,
+  graphql: `${baseUrl}/gql`,
 };
 
 export { apiClient, apiUrls };

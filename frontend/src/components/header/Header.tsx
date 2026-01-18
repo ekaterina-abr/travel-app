@@ -4,74 +4,36 @@ import { Flex, Link, Spinner, Text } from "@chakra-ui/react";
 import { CalendarStar } from "@phosphor-icons/react";
 import { GlobalStore } from "../../stores";
 import { routes } from "../../config";
-import { Notifications } from "./Notifications";
-import { useGetNotifications, useWebSocketClient } from "../../hooks";
-import { apiUrls } from "../../api";
-import { useEffect, useMemo, useState } from "react";
-import {
-  INotification,
-  INotificationWSReceivedMsg,
-  INotificationWSSentMsg,
-} from "../../types";
+import { useGetUserInfo } from "../../hooks";
+import { NotificationsBlock } from "./NotificationsBlock";
+import { Logout } from "./Logout";
+import { useMemo } from "react";
 
 interface IHeader {
   globalStore: GlobalStore;
 }
 
 export const Header = observer(({ globalStore }: IHeader) => {
-  const [notifications, setNotifications] = useState<INotification[]>([]);
-  const { data: notificationsData, isLoading: notificationsIsLoading } =
-    useGetNotifications();
-
-  const shouldConnectWSNotifications = useMemo(
-    () => !!notificationsData,
-    [notificationsData]
-  );
-
   const {
-    sendJsonMessage: sendJsonMessageNotifications,
-    lastJsonMessage: lastJsonMessageNotifications,
-  } = useWebSocketClient<INotificationWSReceivedMsg>({
-    url: apiUrls.updateNotifications,
-    shouldConnect: shouldConnectWSNotifications,
-  });
+    loading: userInfoLoading,
+    data: userInfoData,
+    // error: userInfoError,
+  } = useGetUserInfo();
 
-  useEffect(() => {
-    if (
-      notificationsData?.notifications &&
-      notificationsData.notifications.length > 0
-    ) {
-      setNotifications(notificationsData.notifications);
-    }
-  }, [notificationsData]);
+  const isAuth = useMemo(() => !!userInfoData?.getUserInfo?.id, [userInfoData]);
 
-  useEffect(() => {
-    if (
-      lastJsonMessageNotifications &&
-      lastJsonMessageNotifications.type === "new-notification" &&
-      lastJsonMessageNotifications.msg
-    ) {
-      setNotifications((prevValue) => [
-        lastJsonMessageNotifications.msg,
-        ...prevValue,
-      ]);
+  const selectedDestinations = useMemo(() => {
+    if (isAuth) {
+      return userInfoData!.getUserInfo.saved_destinations;
+    } else {
+      return [...globalStore.selectedDestinations];
     }
-  }, [lastJsonMessageNotifications]);
-
-  const onMarkNotificationRead = (notificationId: number) => {
-    sendJsonMessageNotifications<INotificationWSSentMsg>({
-      type: "mark-read",
-      id: notificationId,
-    });
-    const notificationIndex = notifications.findIndex(
-      (item) => item.id === notificationId
-    );
-    if (notificationIndex !== -1) {
-      const _notifications = [...notifications];
-      _notifications[notificationIndex].isRead = true;
-      setNotifications(_notifications);
-    }
-  };
+  }, [
+    isAuth,
+    userInfoData,
+    globalStore.selectedDestinations,
+    globalStore.selectedDestinations.size,
+  ]);
 
   return (
     <Flex
@@ -83,23 +45,25 @@ export const Header = observer(({ globalStore }: IHeader) => {
       <Link asChild color="darkBlue">
         <RouterLink to="/">Главная</RouterLink>
       </Link>
-      <Flex alignItems="center" gap={4}>
-        {notificationsIsLoading ? (
+      <Flex alignItems="center" gap={2}>
+        {userInfoLoading ? (
           <Spinner />
+        ) : isAuth ? (
+          <NotificationsBlock />
         ) : (
-          <Notifications
-            notifications={notifications}
-            onMarkRead={onMarkNotificationRead}
-          />
+          <Link asChild color="darkBlue">
+            <RouterLink to={routes.login}>Войти</RouterLink>
+          </Link>
         )}
         <Link asChild color="darkBlue">
           <RouterLink to={routes.profile}>
             <Flex alignItems="center" gap={1}>
               <CalendarStar weight="fill" size={24} />
-              <Text fontSize="lg">{globalStore.selectedDestinations.size}</Text>
+              <Text fontSize="lg">{selectedDestinations.length}</Text>
             </Flex>
           </RouterLink>
         </Link>
+        {isAuth && <Logout />}
       </Flex>
     </Flex>
   );
